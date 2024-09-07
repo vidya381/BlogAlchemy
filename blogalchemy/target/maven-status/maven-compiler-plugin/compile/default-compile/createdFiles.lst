@@ -1,0 +1,5 @@
+com/example/blogalchemy/BlogalchemyApplication.class
+com/example/blogalchemy/controller/PostController.class
+com/example/blogalchemy/model/Post.class
+com/example/blogalchemy/repository/PostRepository.class
+com/example/blogalchemy/service/PostService.class
