@@ -72,4 +72,10 @@ public class PostController {
         postService.deletePost(id);
         return "redirect:/posts";
     }
+
+    @GetMapping("/health")
+    @ResponseBody
+    public String healthCheck() {
+        return "Application is running!";
+    }
 }
