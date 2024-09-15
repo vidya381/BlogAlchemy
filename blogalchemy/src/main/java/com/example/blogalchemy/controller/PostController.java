@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.blogalchemy.model.Post;
 import com.example.blogalchemy.service.PostService;
@@ -35,8 +34,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/view";
     }
@@ -55,8 +53,7 @@ public class PostController {
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/edit";
     }
@@ -72,11 +69,5 @@ public class PostController {
     public String deletePost(@PathVariable Long id) {
         postService.deletePost(id);
         return "redirect:/posts";
-    }
-
-    @GetMapping("/health")
-    @ResponseBody
-    public String healthCheck() {
-        return "Application is running!";
     }
 }

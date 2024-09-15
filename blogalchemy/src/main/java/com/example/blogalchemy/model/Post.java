@@ -27,7 +27,6 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    // Constructors, getters, and setters
     public Post() {
         this.createdAt = LocalDateTime.now();
     }

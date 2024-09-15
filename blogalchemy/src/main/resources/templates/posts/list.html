@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -38,12 +38,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Sample Post</td>
-                    <td>Sample Author</td>
+                <tr th:each="post : ${posts}">
+                    <td th:text="${post.title}">Sample Post</td>
+                    <td th:text="${post.author}">Sample Author</td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                        <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary">Edit</a>
+                        <a th:href="@{/posts/{id}/delete(id=${post.id})}" class="btn btn-sm btn-danger">Delete</a>
                     </td>
                 </tr>
             </tbody>
