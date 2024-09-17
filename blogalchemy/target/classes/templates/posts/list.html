@@ -39,7 +39,7 @@
             </thead>
             <tbody>
                 <tr th:each="post : ${posts}">
-                    <td th:text="${post.title}">Sample Post</td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">Sample Post</a></td>
                     <td th:text="${post.author}">Sample Author</td>
                     <td>
                         <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary">Edit</a>

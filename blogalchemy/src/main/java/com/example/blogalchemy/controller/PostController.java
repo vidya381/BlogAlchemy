@@ -1,28 +1,27 @@
 package com.example.blogalchemy.controller;
 
-import java.util.List;
-
+import com.example.blogalchemy.model.Comment;
+import com.example.blogalchemy.model.Post;
+import com.example.blogalchemy.service.CommentService;
+import com.example.blogalchemy.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.blogalchemy.model.Post;
-import com.example.blogalchemy.service.PostService;
+import java.util.List;
 
 @Controller
 @RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(PostService postService, CommentService commentService) {
         this.postService = postService;
+        this.commentService = commentService;
     }
 
     @GetMapping
@@ -36,6 +35,7 @@ public class PostController {
     public String getPost(@PathVariable Long id, Model model) {
         Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
+        model.addAttribute("newComment", new Comment());
         return "posts/view";
     }
 
@@ -69,5 +69,20 @@ public class PostController {
     public String deletePost(@PathVariable Long id) {
         postService.deletePost(id);
         return "redirect:/posts";
+    }
+
+    @PostMapping("/{postId}/comments")
+    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment) {
+        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        commentService.createComment(comment, post, null);
+        return "redirect:/posts/" + postId;
+    }
+
+    @PostMapping("/{postId}/comments/{parentId}/reply")
+    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply) {
+        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Comment parent = commentService.getCommentById(parentId).orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
+        commentService.createComment(reply, post, parent);
+        return "redirect:/posts/" + postId;
     }
 }
