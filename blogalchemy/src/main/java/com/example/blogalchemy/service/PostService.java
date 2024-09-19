@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.blogalchemy.model.Post;
+import com.example.blogalchemy.model.User;
 import com.example.blogalchemy.repository.PostRepository;
 
 @Service
@@ -37,5 +38,13 @@ public class PostService {
 
     public void deletePost(Long id) {
         postRepository.deleteById(id);
+    }
+
+    public List<Post> getFeaturedPosts() {
+        return postRepository.findByFeaturedTrue();
+    }
+
+    public List<Post> getPostsByAuthor(User author) {
+        return postRepository.findByAuthor(author);
     }
 }

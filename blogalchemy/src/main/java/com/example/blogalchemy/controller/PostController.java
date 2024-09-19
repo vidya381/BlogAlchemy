@@ -1,15 +1,24 @@
 package com.example.blogalchemy.controller;
 
-import com.example.blogalchemy.model.Comment;
-import com.example.blogalchemy.model.Post;
-import com.example.blogalchemy.service.CommentService;
-import com.example.blogalchemy.service.PostService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
+import com.example.blogalchemy.model.Comment;
+import com.example.blogalchemy.model.Post;
+import com.example.blogalchemy.model.User;
+import com.example.blogalchemy.service.CommentService;
+import com.example.blogalchemy.service.PostService;
+import com.example.blogalchemy.service.UserService;
 
 @Controller
 @RequestMapping("/posts")
@@ -17,11 +26,13 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final UserService userService;
 
     @Autowired
-    public PostController(PostService postService, CommentService commentService) {
+    public PostController(PostService postService, CommentService commentService, UserService userService) {
         this.postService = postService;
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -33,7 +44,8 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         model.addAttribute("newComment", new Comment());
         return "posts/view";
@@ -46,14 +58,18 @@ public class PostController {
     }
 
     @PostMapping
-    public String createPost(@ModelAttribute Post post) {
+    public String createPost(@ModelAttribute Post post, @AuthenticationPrincipal UserDetails userDetails) {
+        User author = userService.getUserByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        post.setAuthor(author);
         postService.createPost(post);
         return "redirect:/posts";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/edit";
     }
@@ -72,17 +88,37 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments")
-    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment) {
-        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        User author = userService.getUserByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        comment.setAuthor(author.getUsername());
         commentService.createComment(comment, post, null);
         return "redirect:/posts/" + postId;
     }
 
     @PostMapping("/{postId}/comments/{parentId}/reply")
-    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply) {
-        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
-        Comment parent = commentService.getCommentById(parentId).orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
+    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Comment parent = commentService.getCommentById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
+        User author = userService.getUserByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        reply.setAuthor(author.getUsername());
         commentService.createComment(reply, post, parent);
         return "redirect:/posts/" + postId;
+    }
+
+    @PostMapping("/{id}/feature")
+    public String featurePost(@PathVariable Long id) {
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        post.setFeatured(!post.isFeatured());
+        postService.updatePost(post);
+        return "redirect:/posts";
     }
 }
