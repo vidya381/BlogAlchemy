@@ -44,8 +44,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         model.addAttribute("newComment", new Comment());
         return "posts/view";
@@ -68,8 +67,7 @@ public class PostController {
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/edit";
     }
@@ -88,10 +86,8 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments")
-    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Post post = postService.getPostById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment, @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         comment.setAuthor(author.getUsername());
@@ -100,12 +96,9 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments/{parentId}/reply")
-    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Post post = postService.getPostById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
-        Comment parent = commentService.getCommentById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
+    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply, @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Comment parent = commentService.getCommentById(parentId).orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         reply.setAuthor(author.getUsername());
@@ -115,8 +108,7 @@ public class PostController {
 
     @PostMapping("/{id}/feature")
     public String featurePost(@PathVariable Long id) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         post.setFeatured(!post.isFeatured());
         postService.updatePost(post);
         return "redirect:/posts";

@@ -34,44 +34,74 @@ public class User {
     private List<Post> posts = new ArrayList<>();
 
     // Getters and setters
-
+    /**
+     * @return Long return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return String return the username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * @param username the username to set
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * @return String return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * @return String return the role
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * @param role the role to set
+     */
     public void setRole(String role) {
-        this.role = role.startsWith("ROLE_") ? role.substring(5) : role;
+        this.role = role;
     }
 
+    /**
+     * @return List<Post> return the posts
+     */
     public List<Post> getPosts() {
         return posts;
     }
 
+    /**
+     * @param posts the posts to set
+     */
     public void setPosts(List<Post> posts) {
         this.posts = posts;
     }
+
 }

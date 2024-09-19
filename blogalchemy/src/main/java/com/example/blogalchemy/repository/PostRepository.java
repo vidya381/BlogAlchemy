@@ -11,6 +11,5 @@ import com.example.blogalchemy.model.User;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByFeaturedTrue();
-
     List<Post> findByAuthor(User author);
 }

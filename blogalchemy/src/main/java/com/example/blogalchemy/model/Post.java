@@ -14,8 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "post")
 public class Post {
 
     @Id
@@ -29,7 +31,7 @@ public class Post {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author", nullable = false)
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
     @Column(nullable = false)
@@ -46,60 +48,102 @@ public class Post {
     }
 
     // Getters and setters
-
+    /**
+     * @return Long return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return String return the title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * @param title the title to set
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * @return String return the content
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * @param content the content to set
+     */
     public void setContent(String content) {
         this.content = content;
     }
 
+    /**
+     * @return User return the author
+     */
     public User getAuthor() {
         return author;
     }
 
+    /**
+     * @param author the author to set
+     */
     public void setAuthor(User author) {
         this.author = author;
     }
 
+    /**
+     * @return LocalDateTime return the createdAt
+     */
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
+    /**
+     * @param createdAt the createdAt to set
+     */
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
+    /**
+     * @return boolean return the featured
+     */
     public boolean isFeatured() {
         return featured;
     }
 
+    /**
+     * @param featured the featured to set
+     */
     public void setFeatured(boolean featured) {
         this.featured = featured;
     }
 
+    /**
+     * @return List<Comment> return the comments
+     */
     public List<Comment> getComments() {
         return comments;
     }
 
+    /**
+     * @param comments the comments to set
+     */
     public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
+
 }
