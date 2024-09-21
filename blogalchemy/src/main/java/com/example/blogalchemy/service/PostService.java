@@ -47,4 +47,8 @@ public class PostService {
     public List<Post> getPostsByAuthor(User author) {
         return postRepository.findByAuthor(author);
     }
+
+    public List<Post> searchPosts(String keyword) {
+        return postRepository.searchPosts(keyword);
+    }
 }

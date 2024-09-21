@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.blogalchemy.model.Comment;
 import com.example.blogalchemy.model.Post;
@@ -36,15 +37,22 @@ public class PostController {
     }
 
     @GetMapping
-    public String getAllPosts(Model model) {
-        List<Post> posts = postService.getAllPosts();
+    public String getAllPosts(Model model, @RequestParam(required = false) String keyword) {
+        List<Post> posts;
+        if (keyword != null && !keyword.isEmpty()) {
+            posts = postService.searchPosts(keyword);
+            model.addAttribute("keyword", keyword);
+        } else {
+            posts = postService.getAllPosts();
+        }
         model.addAttribute("posts", posts);
         return "posts/list";
     }
 
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         model.addAttribute("newComment", new Comment());
         return "posts/view";
@@ -67,7 +75,8 @@ public class PostController {
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/edit";
     }
@@ -86,8 +95,10 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments")
-    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment, @AuthenticationPrincipal UserDetails userDetails) {
-        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+    public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         comment.setAuthor(author.getUsername());
@@ -96,9 +107,12 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments/{parentId}/reply")
-    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply, @AuthenticationPrincipal UserDetails userDetails) {
-        Post post = postService.getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
-        Comment parent = commentService.getCommentById(parentId).orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
+    public String addReply(@PathVariable Long postId, @PathVariable Long parentId, @ModelAttribute Comment reply,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Post post = postService.getPostById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Comment parent = commentService.getCommentById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         reply.setAuthor(author.getUsername());
@@ -108,9 +122,19 @@ public class PostController {
 
     @PostMapping("/{id}/feature")
     public String featurePost(@PathVariable Long id) {
-        Post post = postService.getPostById(id).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         post.setFeatured(!post.isFeatured());
         postService.updatePost(post);
         return "redirect:/posts";
     }
+
+    @GetMapping("/search")
+    public String searchPosts(@RequestParam String keyword, Model model) {
+        List<Post> searchResults = postService.searchPosts(keyword);
+        model.addAttribute("posts", searchResults);
+        model.addAttribute("keyword", keyword);
+        return "posts/list";
+    }
+
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,22 +13,29 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="/posts">Blog Posts <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">
                     <a class="nav-link" href="/posts/new">New Post</a>
                 </li>
             </ul>
+            <form class="form-inline my-2 my-lg-0" action="/posts/search" method="get">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search posts" aria-label="Search" name="keyword" th:value="${keyword}">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
         </div>
     </nav>
 
     <div class="container mt-4">
         <h1>Blog Posts</h1>
+        <div th:if="${keyword}" class="alert alert-info">
+            Search results for: <span th:text="${keyword}"></span>
+        </div>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -40,10 +47,10 @@
             <tbody>
                 <tr th:each="post : ${posts}">
                     <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">Sample Post</a></td>
-                    <td th:text="${post.author}">Sample Author</td>
+                    <td th:text="${post.author.username}">Sample Author</td>
                     <td>
-                        <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary">Edit</a>
-                        <a th:href="@{/posts/{id}/delete(id=${post.id})}" class="btn btn-sm btn-danger">Delete</a>
+                        <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Edit</a>
+                        <a th:href="@{/posts/{id}/delete(id=${post.id})}" class="btn btn-sm btn-danger" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Delete</a>
                     </td>
                 </tr>
             </tbody>
