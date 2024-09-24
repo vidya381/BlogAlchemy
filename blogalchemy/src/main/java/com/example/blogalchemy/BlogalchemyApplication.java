@@ -10,4 +10,10 @@ public class BlogalchemyApplication {
 		SpringApplication.run(BlogalchemyApplication.class, args);
 	}
 
+	// @Bean
+	// public CommandLineRunner setupDefaultUser(UserService userService) {
+	// 	return args -> {
+	// 		userService.createAdminUser("admin", "admin#password");
+	// 	};
+	// }
 }

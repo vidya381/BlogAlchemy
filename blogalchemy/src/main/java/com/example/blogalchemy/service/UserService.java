@@ -33,4 +33,12 @@ public class UserService {
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
+
+    // public User createAdminUser(String username, String password) {
+    //     User adminUser = new User();
+    //     adminUser.setUsername(username);
+    //     adminUser.setPassword(passwordEncoder.encode(password));
+    //     adminUser.setRole("ADMIN");
+    //     return userRepository.save(adminUser);
+    // }
 }

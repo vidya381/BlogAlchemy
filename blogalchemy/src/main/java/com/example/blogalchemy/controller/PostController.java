@@ -3,6 +3,7 @@ package com.example.blogalchemy.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -126,6 +127,13 @@ public class PostController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         post.setFeatured(!post.isFeatured());
         postService.updatePost(post);
+        return "redirect:/posts";
+    }
+
+    @PostMapping("/{id}/toggle-featured")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String toggleFeaturedStatus(@PathVariable Long id) {
+        postService.toggleFeaturedStatus(id);
         return "redirect:/posts";
     }
 

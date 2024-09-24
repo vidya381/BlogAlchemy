@@ -44,6 +44,12 @@ public class PostService {
         return postRepository.findByFeaturedTrue();
     }
 
+    public void toggleFeaturedStatus(Long postId) {
+        Post post = getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        post.setFeatured(!post.isFeatured());
+        postRepository.save(post);
+    }
+
     public List<Post> getPostsByAuthor(User author) {
         return postRepository.findByAuthor(author);
     }
