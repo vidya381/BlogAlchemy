@@ -17,22 +17,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/register", "/users/register", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/posts/new", "/posts/*/edit", "/posts/*/delete").hasAnyRole("ADMIN", "AUTHOR")
-                .requestMatchers("/posts/*/toggle-featured").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .formLogin((form) -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/")
-                .permitAll()
-            )
-            .logout((logout) -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            );
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/", "/register", "/users/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/posts/new", "/posts/*/edit", "/posts/*/delete").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("/posts/*/toggle-featured").hasRole("ADMIN")
+                        .requestMatchers("/users/*").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin((form) -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .permitAll())
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll());
 
         return http.build();
     }

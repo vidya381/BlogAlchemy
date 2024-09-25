@@ -47,7 +47,7 @@
             <tbody>
                 <tr th:each="post : ${posts}">
                     <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">Sample Post</a></td>
-                    <td th:text="${post.author.username}">Sample Author</td>
+                    <td><a th:href="@{/users/{id}(id=${post.author.id})}" th:text="${post.author.username}">Sample Author</a></td>
                     <td>
                         <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Edit</a>
                         <a th:href="@{/posts/{id}/delete(id=${post.id})}" class="btn btn-sm btn-danger" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Delete</a>
