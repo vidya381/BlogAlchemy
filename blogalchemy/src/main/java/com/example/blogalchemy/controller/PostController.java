@@ -1,9 +1,9 @@
 package com.example.blogalchemy.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blogalchemy.model.Comment;
 import com.example.blogalchemy.model.Post;
@@ -66,11 +67,13 @@ public class PostController {
     }
 
     @PostMapping
-    public String createPost(@ModelAttribute Post post, @AuthenticationPrincipal UserDetails userDetails) {
+    public String createPost(@ModelAttribute Post post,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("images") List<MultipartFile> imageFiles) throws IOException {
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         post.setAuthor(author);
-        postService.createPost(post);
+        postService.createPost(post, imageFiles);
         return "redirect:/posts";
     }
 
@@ -121,28 +124,12 @@ public class PostController {
         return "redirect:/posts/" + postId;
     }
 
-    @PostMapping("/{id}/feature")
-    public String featurePost(@PathVariable Long id) {
+    @PostMapping("/{id}/toggle-featured")
+    public String toggleFeaturedStatus(@PathVariable Long id) {
         Post post = postService.getPostById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         post.setFeatured(!post.isFeatured());
         postService.updatePost(post);
         return "redirect:/posts";
     }
-
-    @PostMapping("/{id}/toggle-featured")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String toggleFeaturedStatus(@PathVariable Long id) {
-        postService.toggleFeaturedStatus(id);
-        return "redirect:/posts";
-    }
-
-    @GetMapping("/search")
-    public String searchPosts(@RequestParam String keyword, Model model) {
-        List<Post> searchResults = postService.searchPosts(keyword);
-        model.addAttribute("posts", searchResults);
-        model.addAttribute("keyword", keyword);
-        return "posts/list";
-    }
-
 }

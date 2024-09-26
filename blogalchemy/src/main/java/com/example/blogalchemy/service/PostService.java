@@ -1,23 +1,41 @@
 package com.example.blogalchemy.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.blogalchemy.model.Image;
 import com.example.blogalchemy.model.Post;
 import com.example.blogalchemy.model.User;
+import com.example.blogalchemy.repository.ImageRepository;
 import com.example.blogalchemy.repository.PostRepository;
 
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
+    // private final ImageRepository imageRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository) {
+    private ImageRepository imageRepository;
+
+    @Value("${upload.dir}")
+    private String uploadDir;
+
+    @Autowired
+    public PostService(PostRepository postRepository, ImageRepository imageRepository) {
         this.postRepository = postRepository;
+        this.imageRepository = imageRepository;
     }
 
     public List<Post> getAllPosts() {
@@ -25,11 +43,32 @@ public class PostService {
     }
 
     public Optional<Post> getPostById(Long id) {
-        return postRepository.findById(id);
+        Optional<Post> postOptional = postRepository.findById(id);
+        postOptional.ifPresent(post -> {
+            List<Image> images = imageRepository.findByPostId(post.getId());
+            post.setImages(images);
+        });
+        return postOptional;
     }
 
-    public Post createPost(Post post) {
-        return postRepository.save(post);
+    public Post createPost(Post post, List<MultipartFile> imageFiles) throws IOException {
+        Post savedPost = postRepository.save(post);
+
+        for (MultipartFile imageFile : imageFiles) {
+            if (!imageFile.isEmpty()) {
+                String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+                Path filePath = Paths.get(uploadDir, fileName);
+                Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                Image image = new Image();
+                image.setFileName(fileName);
+                image.setFilePath(filePath.toString());
+                image.setPost(savedPost);
+                imageRepository.save(image);
+            }
+        }
+
+        return savedPost;
     }
 
     public Post updatePost(Post post) {
@@ -42,12 +81,6 @@ public class PostService {
 
     public List<Post> getFeaturedPosts() {
         return postRepository.findByFeaturedTrue();
-    }
-
-    public void toggleFeaturedStatus(Long postId) {
-        Post post = getPostById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
-        post.setFeatured(!post.isFeatured());
-        postRepository.save(post);
     }
 
     public List<Post> getPostsByAuthor(User author) {

@@ -1,12 +1,15 @@
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/BlogalchemyApplication.java
+/Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/config/MvcConfig.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/config/SecurityConfig.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/controller/HomeController.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/controller/PostController.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/controller/UserController.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/model/Comment.java
+/Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/model/Image.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/model/Post.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/model/User.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/repository/CommentRepository.java
+/Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/repository/ImageRepository.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/repository/PostRepository.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/repository/UserRepository.java
 /Users/vidyasagar/Documents/GitHub/Git Repositories/BlogAlchemy/blogalchemy/src/main/java/com/example/blogalchemy/service/CommentService.java

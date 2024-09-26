@@ -14,10 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "post")
 public class Post {
 
     @Id
@@ -42,6 +40,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
 
     public Post() {
         this.createdAt = LocalDateTime.now();
@@ -144,6 +145,20 @@ public class Post {
      */
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    /**
+     * @return List<Image> return the images
+     */
+    public List<Image> getImages() {
+        return images;
+    }
+
+    /**
+     * @param images the images to set
+     */
+    public void setImages(List<Image> images) {
+        this.images = images;
     }
 
 }
