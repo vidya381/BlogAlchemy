@@ -87,7 +87,11 @@ public class PostService {
         return postRepository.findByAuthor(author);
     }
 
+    // public List<Post> searchPosts(String keyword) {
+    // return postRepository.searchPosts(keyword);
+    // }
+
     public List<Post> searchPosts(String keyword) {
-        return postRepository.searchPosts(keyword);
+        return postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
     }
 }
