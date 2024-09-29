@@ -38,7 +38,7 @@
     <div class="container mt-5">
         <h1 th:text="${post.title}"></h1>
         <p>By <a th:href="@{/users/{id}(id=${post.author.id})}" th:text="${post.author.username}"></a></p>
-        <p th:text="${post.content}"></p>
+        <div th:utext="${post.content}"></div>
 
         <div th:if="${post.images != null and not #lists.isEmpty(post.images)}">
             <h3>Images:</h3>
