@@ -1,6 +1,7 @@
 package com.example.blogalchemy.controller;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,9 +106,13 @@ public class PostController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
+
         comment.setAuthor(author.getUsername());
-        comment.setPost(post); // Set the post directly on the comment
-        commentService.createComment(comment); // Only pass the comment
+        comment.setPost(post);
+        comment.setCreatedAt(LocalDateTime.now());
+
+        commentService.createComment(comment);
+
         return "redirect:/posts/" + postId;
     }
 
@@ -120,8 +125,12 @@ public class PostController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + parentId));
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
+
         reply.setAuthor(author.getUsername());
-        commentService.createComment(reply, post, parent);
+        reply.setCreatedAt(LocalDateTime.now());
+
+        commentService.createReply(reply, post, parent);
+
         return "redirect:/posts/" + postId;
     }
 
