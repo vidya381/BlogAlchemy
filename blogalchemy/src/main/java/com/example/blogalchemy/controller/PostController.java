@@ -106,7 +106,8 @@ public class PostController {
         User author = userService.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         comment.setAuthor(author.getUsername());
-        commentService.createComment(comment, post, null);
+        comment.setPost(post); // Set the post directly on the comment
+        commentService.createComment(comment); // Only pass the comment
         return "redirect:/posts/" + postId;
     }
 

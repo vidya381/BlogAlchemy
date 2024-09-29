@@ -161,4 +161,14 @@ public class Post {
         this.images = images;
     }
 
+    public void addImage(Image image) {
+        images.add(image);
+        image.setPost(this);
+    }
+
+    public void removeImage(Image image) {
+        images.remove(image);
+        image.setPost(null);
+    }
+
 }

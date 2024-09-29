@@ -1,12 +1,13 @@
 package com.example.blogalchemy.service;
 
-import com.example.blogalchemy.model.Comment;
-import com.example.blogalchemy.model.Post;
-import com.example.blogalchemy.repository.CommentRepository;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import com.example.blogalchemy.model.Comment;
+import com.example.blogalchemy.repository.CommentRepository;
 
 @Service
 public class CommentService {
@@ -18,9 +19,8 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public Comment createComment(Comment comment, Post post, Comment parent) {
-        comment.setPost(post);
-        comment.setParent(parent);
+    @Transactional
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
     }
 

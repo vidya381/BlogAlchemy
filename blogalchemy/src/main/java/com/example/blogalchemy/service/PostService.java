@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,12 +44,10 @@ public class PostService {
     }
 
     public Optional<Post> getPostById(Long id) {
-        Optional<Post> postOptional = postRepository.findById(id);
-        postOptional.ifPresent(post -> {
-            List<Image> images = imageRepository.findByPostId(post.getId());
-            post.setImages(images);
+        return postRepository.findById(id).map(post -> {
+            Hibernate.initialize(post.getImages());
+            return post;
         });
-        return postOptional;
     }
 
     public Post createPost(Post post, List<MultipartFile> imageFiles) throws IOException {
