@@ -44,6 +44,11 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
+    private LocalDateTime scheduledPublishDate;
+
+    @Column(nullable = false)
+    private boolean published = false;
+
     public Post() {
         this.createdAt = LocalDateTime.now();
     }
@@ -169,6 +174,34 @@ public class Post {
     public void removeImage(Image image) {
         images.remove(image);
         image.setPost(null);
+    }
+
+    /**
+     * @return LocalDateTime return the scheduledPublishDate
+     */
+    public LocalDateTime getScheduledPublishDate() {
+        return scheduledPublishDate;
+    }
+
+    /**
+     * @param scheduledPublishDate the scheduledPublishDate to set
+     */
+    public void setScheduledPublishDate(LocalDateTime scheduledPublishDate) {
+        this.scheduledPublishDate = scheduledPublishDate;
+    }
+
+    /**
+     * @return boolean return the published
+     */
+    public boolean isPublished() {
+        return published;
+    }
+
+    /**
+     * @param published the published to set
+     */
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
 }

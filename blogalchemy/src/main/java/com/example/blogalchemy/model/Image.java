@@ -1,7 +1,6 @@
 package com.example.blogalchemy.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,7 +17,7 @@ public class Image {
     private String fileName;
     private String filePath;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

@@ -1,6 +1,8 @@
 package com.example.blogalchemy.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +24,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> searchPosts(@Param("keyword") String keyword);
 
     List<Post> findByTitleContainingOrContentContaining(String title, String content);
+
+    List<Post> findByScheduledPublishDateBeforeAndPublishedFalse(LocalDateTime dateTime);
+
+    List<Post> findByPublishedTrue();
+
+    List<Post> findByPublishedFalseAndScheduledPublishDateNotNull();
+
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.images WHERE p.id = :id")
+    Optional<Post> findByIdWithImages(@Param("id") Long id);
+
 }

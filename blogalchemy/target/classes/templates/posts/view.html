@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title th:text="${post.title} + ' - BlogAlchemy'"></title>
+    <title th:text="${post != null ? post.title + ' - BlogAlchemy' : 'Post Not Found'}"></title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -36,42 +36,57 @@
     </nav>
 
     <div class="container mt-5">
-        <h1 th:text="${post.title}"></h1>
-        <p>By <a th:href="@{/users/{id}(id=${post.author.id})}" th:text="${post.author.username}"></a></p>
-        <div th:utext="${post.content}"></div>
+        <div th:if="${post != null}">
+            <h1 th:text="${post.title}"></h1>
+            <p>By <span th:text="${post.author != null ? post.author.username : 'Unknown Author'}"></span></p>
+            <div th:utext="${post.content}"></div>
 
-        <div th:if="${post.images != null and not #lists.isEmpty(post.images)}">
-            <h3>Images:</h3>
-            <div th:each="image : ${post.images}">
-                <img th:src="@{'/uploads/' + ${image.fileName}}" alt="Post image" style="max-width: 100%; height: auto;" class="mb-3">
-            </div>
-        </div>
-
-        <h3 class="mt-4">Comments</h3>
-        <div th:each="comment : ${post.comments}" class="mb-3">
-            <div th:if="${comment.parent == null}">
-                <strong th:text="${comment.author}"></strong>
-                <p th:text="${comment.content}"></p>
-                <div th:each="reply : ${post.comments}" th:if="${reply.parent != null and reply.parent.id == comment.id}" class="ml-4">
-                    <strong th:text="${reply.author}"></strong>
-                    <p th:text="${reply.content}"></p>
+            <div th:if="${post.images != null and not #lists.isEmpty(post.images)}">
+                <h3>Images:</h3>
+                <div th:each="image : ${post.images}">
+                    <img th:if="${image != null and image.fileName != null}" 
+                         th:src="@{'/uploads/' + ${image.fileName}}" 
+                         alt="Post image" 
+                         style="max-width: 100%; height: auto;" 
+                         class="mb-3">
                 </div>
-                <form th:action="@{/posts/{postId}/comments/{commentId}/reply(postId=${post.id},commentId=${comment.id})}" method="post" class="mb-3">
-                    <div class="form-group">
-                        <textarea class="form-control" name="content" rows="2" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
-                </form>
             </div>
-        </div>
 
-        <h4>Add a comment</h4>
-        <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${newComment}" method="post">
-            <div class="form-group">
-                <textarea class="form-control" th:field="*{content}" rows="3" required></textarea>
+            <h3 class="mt-4">Comments</h3>
+            <div th:if="${post.comments != null and not #lists.isEmpty(post.comments)}">
+                <div th:each="comment : ${post.comments}" class="mb-3">
+                    <div th:if="${comment.parent == null}">
+                        <strong th:text="${comment.author}"></strong>
+                        <p th:text="${comment.content}"></p>
+                        <div th:each="reply : ${post.comments}" th:if="${reply.parent != null and reply.parent.id == comment.id}" class="ml-4">
+                            <strong th:text="${reply.author}"></strong>
+                            <p th:text="${reply.content}"></p>
+                        </div>
+                        <form th:action="@{/posts/{postId}/comments/{commentId}/reply(postId=${post.id},commentId=${comment.id})}" method="post" class="mb-3">
+                            <div class="form-group">
+                                <textarea class="form-control" name="content" rows="2" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Submit Comment</button>
-        </form>
+            <div th:if="${post.comments == null or #lists.isEmpty(post.comments)}">
+                <p>No comments yet.</p>
+            </div>
+
+            <h4>Add a comment</h4>
+            <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${newComment}" method="post">
+                <div class="form-group">
+                    <textarea class="form-control" th:field="*{content}" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+            </form>
+        </div>
+        <div th:unless="${post != null}">
+            <h1>Post Not Found</h1>
+            <p>The requested post could not be found.</p>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>

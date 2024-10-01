@@ -2,24 +2,60 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Edit Post</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Edit Post</h1>
-    <form th:action="@{/posts/{id}(id=${post.id})}" th:object="${post}" method="post">
-        <div>
-            <label for="title">Title:</label>
-            <input type="text" id="title" th:field="*{title}" required>
-        </div>
-        <div>
-            <label for="author">Author:</label>
-            <input type="text" id="author" th:field="*{author}" required>
-        </div>
-        <div class="form-group">
-            <label for="content">Content</label>
-            <textarea class="form-control" id="content" th:field="*{content}" rows="10"></textarea>
-        </div>
-        <button type="submit">Update Post</button>
-    </form>
-    <a th:href="@{/posts/{id}(id=${post.id})}">Cancel</a>
+    <div class="container mt-5">
+        <h1>Edit Post</h1>
+        <form th:action="@{/posts/{id}(id=${post.id})}" th:object="${post}" method="post">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" class="form-control" id="author" th:field="*{author}" required>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea class="form-control" id="content" th:field="*{content}" rows="10"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="imageFiles">Images</label>
+                <input type="file" class="form-control-file" id="imageFiles" name="imageFiles" multiple>
+            </div>
+            <div class="form-group">
+                <label for="publishOption">Publish Option</label>
+                <select class="form-control" id="publishOption" name="publishOption">
+                    <option value="now" th:selected="${post.scheduledPublishDate == null}">Publish Now</option>
+                    <option value="schedule" th:selected="${post.scheduledPublishDate != null}">Schedule for Later</option>
+                </select>
+            </div>
+            <div class="form-group" id="scheduleDateTimeGroup" th:style="${post.scheduledPublishDate != null ? 'display: block;' : 'display: none;'}">
+                <label for="scheduleDateTime">Schedule Date and Time</label>
+                <input type="datetime-local" class="form-control" id="scheduleDateTime" name="scheduleDateTime" 
+                       th:value="${post.scheduledPublishDate != null ? #temporals.format(post.scheduledPublishDate, 'yyyy-MM-dd''T''HH:mm') : ''}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Post</button>
+            <a th:href="@{/posts/{id}(id=${post.id})}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#publishOption').change(function() {
+                if ($(this).val() === 'schedule') {
+                    $('#scheduleDateTimeGroup').show();
+                } else {
+                    $('#scheduleDateTimeGroup').hide();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -2,9 +2,12 @@ package com.example.blogalchemy.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -54,11 +57,18 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
-        Post post = postService.getPostById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
-        model.addAttribute("post", post);
-        model.addAttribute("newComment", new Comment());
-        return "posts/view";
+        Optional<Post> postOptional = postService.getPostById(id);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            // Ensure images are loaded
+            post.getImages().size(); // This triggers lazy loading
+            model.addAttribute("post", post);
+            model.addAttribute("newComment", new Comment());
+            return "posts/view";
+        } else {
+            model.addAttribute("errorMessage", "Post not found");
+            return "error/404";
+        }
     }
 
     @GetMapping("/new")
@@ -67,30 +77,12 @@ public class PostController {
         return "posts/create";
     }
 
-    @PostMapping
-    public String createPost(@ModelAttribute Post post,
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam("images") List<MultipartFile> imageFiles) throws IOException {
-        User author = userService.getUserByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        post.setAuthor(author);
-        postService.createPost(post, imageFiles);
-        return "redirect:/posts";
-    }
-
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
         Post post = postService.getPostById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
         model.addAttribute("post", post);
         return "posts/edit";
-    }
-
-    @PostMapping("/{id}")
-    public String updatePost(@PathVariable Long id, @ModelAttribute Post post) {
-        post.setId(id);
-        postService.updatePost(post);
-        return "redirect:/posts";
     }
 
     @GetMapping("/{id}/delete")
@@ -142,4 +134,61 @@ public class PostController {
         postService.updatePost(post);
         return "redirect:/posts";
     }
+
+    @PostMapping
+    public String createPost(@ModelAttribute Post post,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @RequestParam(value = "publishOption", required = false) String publishOption,
+            @RequestParam(value = "scheduleDateTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime scheduleDateTime)
+            throws IOException {
+        User author = userService.getUserByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        post.setAuthor(author);
+
+        if ("schedule".equals(publishOption) && scheduleDateTime != null) {
+            post.setScheduledPublishDate(scheduleDateTime);
+            post.setPublished(false);
+        } else {
+            post.setPublished(true);
+        }
+
+        postService.createPost(post, imageFiles != null ? imageFiles : Collections.emptyList());
+        return "redirect:/posts";
+    }
+
+    @PostMapping("/{id}")
+    public String updatePost(@PathVariable Long id,
+            @ModelAttribute Post post,
+            @RequestParam("publishOption") String publishOption,
+            @RequestParam(value = "scheduleDateTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime scheduleDateTime) {
+        Post existingPost = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+
+        existingPost.setTitle(post.getTitle());
+        existingPost.setContent(post.getContent());
+
+        if ("schedule".equals(publishOption) && scheduleDateTime != null) {
+            existingPost.setScheduledPublishDate(scheduleDateTime);
+            existingPost.setPublished(false);
+        } else {
+            existingPost.setScheduledPublishDate(null);
+            existingPost.setPublished(true);
+        }
+
+        postService.updatePost(existingPost);
+        return "redirect:/posts";
+    }
+
+    @PostMapping("/{id}/schedule")
+    public String schedulePost(@PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime scheduleDateTime) {
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + id));
+        post.setScheduledPublishDate(scheduleDateTime);
+        post.setPublished(false);
+        postService.updatePost(post);
+        return "redirect:/posts";
+    }
+
 }

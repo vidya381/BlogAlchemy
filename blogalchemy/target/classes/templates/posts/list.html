@@ -49,6 +49,7 @@
                 <tr>
                     <th>Title</th>
                     <th>Author</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -56,6 +57,10 @@
                 <tr th:each="post : ${posts}">
                     <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">Sample Post</a></td>
                     <td><a th:href="@{/users/{id}(id=${post.author.id})}" th:text="${post.author.username}">Sample Author</a></td>
+                    <td>
+                        <span th:if="${post.published}">Published</span>
+                        <span th:unless="${post.published}" th:text="${post.scheduledPublishDate != null ? 'Scheduled for: ' + #temporals.format(post.scheduledPublishDate, 'yyyy-MM-dd HH:mm') : 'Draft'}"></span>
+                    </td>
                     <td>
                         <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-sm btn-primary" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Edit</a>
                         <a th:href="@{/posts/{id}/delete(id=${post.id})}" class="btn btn-sm btn-danger" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">Delete</a>
@@ -65,10 +70,40 @@
                                 <span th:text="${post.featured ? 'Unfeature' : 'Feature'}"></span>
                             </button>
                         </form>
+                        <button type="button" class="btn btn-sm btn-info" data-toggle="modal" th:data-target="'#scheduleModal' + ${post.id}" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">
+                            Schedule
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Schedule Modal for each post -->
+    <div th:each="post : ${posts}" class="modal fade" th:id="'scheduleModal' + ${post.id}" tabindex="-1" role="dialog" th:aria-labelledby="'scheduleModalLabel' + ${post.id}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="'scheduleModalLabel' + ${post.id}">Schedule Post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form th:action="@{/posts/{id}/schedule(id=${post.id})}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <div class="form-group">
+                            <label for="scheduledDate">Scheduled Date and Time</label>
+                            <input type="datetime-local" class="form-control" id="scheduledDate" name="scheduledDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Schedule Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
