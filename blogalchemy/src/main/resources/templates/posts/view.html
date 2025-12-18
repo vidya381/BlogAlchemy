@@ -5,89 +5,274 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title th:text="${post != null ? post.title + ' - BlogAlchemy' : 'Post Not Found'}"></title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .post-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .post-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .post-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .post-meta {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        .post-meta a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .post-meta a:hover {
+            text-decoration: underline;
+        }
+        .post-content {
+            line-height: 1.8;
+            color: #444;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .post-images {
+            margin: 2rem 0;
+        }
+        .post-images img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        .comments-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .comment {
+            border-left: 3px solid #667eea;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .comment-author {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .comment-content {
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        .comment-reply {
+            margin-left: 2rem;
+            margin-top: 1rem;
+            border-left-color: #764ba2;
+        }
+        .comment-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        .empty-comments {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">BlogAlchemy</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/posts">Blog Posts</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">
-                    <a class="nav-link" href="/posts/new">New Post</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" class="btn btn-link nav-link">Logout</button>
-                    </form>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">BlogAlchemy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/posts">Blog Posts</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">
+                        <a class="nav-link" href="/posts/new">
+                            <i class="fas fa-plus-circle"></i> New Post
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/users/register">Register</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-4">
         <div th:if="${post != null}">
-            <h1 th:text="${post.title}"></h1>
-            <p>By <span th:text="${post.author != null ? post.author.username : 'Unknown Author'}"></span></p>
-            <div th:utext="${post.content}"></div>
-
-            <div th:if="${post.images != null and not #lists.isEmpty(post.images)}">
-                <h3>Images:</h3>
-                <div th:each="image : ${post.images}">
-                    <img th:if="${image != null and image.fileName != null}" 
-                         th:src="@{'/uploads/' + ${image.fileName}}" 
-                         alt="Post image" 
-                         style="max-width: 100%; height: auto;" 
-                         class="mb-3">
-                </div>
-            </div>
-
-            <h3 class="mt-4">Comments</h3>
-            <div th:if="${post.comments != null and not #lists.isEmpty(post.comments)}">
-                <div th:each="comment : ${post.comments}" class="mb-3">
-                    <div th:if="${comment.parent == null}">
-                        <strong th:text="${comment.author}"></strong>
-                        <p th:text="${comment.content}"></p>
-                        <div th:each="reply : ${post.comments}" th:if="${reply.parent != null and reply.parent.id == comment.id}" class="ml-4">
-                            <strong th:text="${reply.author}"></strong>
-                            <p th:text="${reply.content}"></p>
-                        </div>
-                        <form th:action="@{/posts/{postId}/comments/{commentId}/reply(postId=${post.id},commentId=${comment.id})}" method="post" class="mb-3">
-                            <div class="form-group">
-                                <textarea class="form-control" name="content" rows="2" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
-                        </form>
+            <div class="post-container">
+                <div class="post-header">
+                    <h1 class="post-title" th:text="${post.title}"></h1>
+                    <div class="post-meta">
+                        <i class="fas fa-user"></i> By 
+                        <a th:href="@{/users/{id}(id=${post.author.id})}" th:text="${post.author != null ? post.author.username : 'Unknown Author'}">Author</a>
+                        <span class="mx-2">•</span>
+                        <i class="fas fa-calendar"></i> 
+                        <span th:if="${post.createdAt != null}" th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy')}"></span>
                     </div>
                 </div>
-            </div>
-            <div th:if="${post.comments == null or #lists.isEmpty(post.comments)}">
-                <p>No comments yet.</p>
+
+                <div class="post-content" th:utext="${post.content}"></div>
+
+                <div th:if="${post.images != null and not #lists.isEmpty(post.images)}" class="post-images">
+                    <h5 class="mb-3"><i class="fas fa-images"></i> Images</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3" th:each="image : ${post.images}">
+                            <img th:if="${image != null and image.fileName != null}" 
+                                 th:src="@{'/uploads/' + ${image.fileName}}" 
+                                 th:alt="${post.title + ' image'}" 
+                                 class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a th:href="@{/posts}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Posts
+                    </a>
+                    <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN', 'AUTHOR')">
+                        <i class="fas fa-edit"></i> Edit Post
+                    </a>
+                </div>
             </div>
 
-            <h4>Add a comment</h4>
-            <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${newComment}" method="post">
-                <div class="form-group">
-                    <textarea class="form-control" th:field="*{content}" rows="3" required></textarea>
+            <div class="comments-section">
+                <h3 class="section-title">
+                    <i class="fas fa-comments"></i> Comments
+                </h3>
+
+                <div th:if="${post.comments != null and not #lists.isEmpty(post.comments)}">
+                    <div th:each="comment : ${post.comments}">
+                        <div th:if="${comment.parent == null}" class="comment">
+                            <div class="comment-author">
+                                <i class="fas fa-user-circle"></i> <span th:text="${comment.author}"></span>
+                            </div>
+                            <div class="comment-content" th:text="${comment.content}"></div>
+                            
+                            <div th:each="reply : ${post.comments}">
+                                <div th:if="${reply.parent != null and reply.parent.id == comment.id}" class="comment comment-reply">
+                                    <div class="comment-author">
+                                        <i class="fas fa-reply"></i> <span th:text="${reply.author}"></span>
+                                    </div>
+                                    <div class="comment-content" th:text="${reply.content}"></div>
+                                </div>
+                            </div>
+
+                            <form th:action="@{/posts/{postId}/comments/{commentId}/reply(postId=${post.id},commentId=${comment.id})}" method="post" class="mt-3">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <div class="form-group mb-2">
+                                    <textarea class="form-control" name="content" rows="2" placeholder="Write a reply..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-reply"></i> Reply
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit Comment</button>
-            </form>
+
+                <div th:if="${post.comments == null or #lists.isEmpty(post.comments)}" class="empty-comments">
+                    <i class="fas fa-comment-slash" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <p class="mt-2">No comments yet. Be the first to comment!</p>
+                </div>
+
+                <div class="comment-form">
+                    <h5 class="mb-3">Add a Comment</h5>
+                    <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${newComment}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <div class="form-group">
+                            <textarea class="form-control" th:field="*{content}" rows="4" placeholder="Share your thoughts..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Comment
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div th:unless="${post != null}">
+
+        <div th:unless="${post != null}" class="post-container text-center">
+            <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ffc107; margin-bottom: 1rem;"></i>
             <h1>Post Not Found</h1>
-            <p>The requested post could not be found.</p>
+            <p class="text-muted">The requested post could not be found.</p>
+            <a href="/posts" class="btn btn-primary mt-3">
+                <i class="fas fa-arrow-left"></i> Back to Posts
+            </a>
         </div>
     </div>
+
+    <footer class="mt-5 py-4 bg-light text-center">
+        <div class="container">
+            <p class="mb-0 text-muted">&copy; 2024 BlogAlchemy. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>

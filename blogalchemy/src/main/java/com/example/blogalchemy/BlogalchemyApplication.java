@@ -14,8 +14,8 @@ public class BlogalchemyApplication {
 
 	// @Bean
 	// public CommandLineRunner setupDefaultUser(UserService userService) {
-	// 	return args -> {
-	// 		userService.createAdminUser("admin", "admin#password");
-	// 	};
+	// return args -> {
+	// userService.createAdminUser("admin", "admin#password");
+	// };
 	// }
 }

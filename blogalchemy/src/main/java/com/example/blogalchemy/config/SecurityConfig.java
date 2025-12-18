@@ -18,18 +18,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/register", "/users/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/users/register", "/css/**", "/js/**", "/uploads/**").permitAll()
                         .requestMatchers("/posts/new", "/posts/*/edit", "/posts/*/delete").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers("/posts/*/toggle-featured").hasRole("ADMIN")
+                        .requestMatchers("/users/profile").authenticated()
                         .requestMatchers("/users/*").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
                         .permitAll())
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll());
 
         return http.build();

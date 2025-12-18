@@ -3,14 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>404 - Not Found</title>
+    <title>404 - Not Found - BlogAlchemy</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .error-container {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .error-message {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .error-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btn-home {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            color: #764ba2;
+            text-decoration: none;
+        }
+        .error-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>404 - Not Found</h1>
-        <p th:text="${errorMessage ?: 'The requested resource could not be found.'}"></p>
-        <a href="/" class="btn btn-primary">Go to Home</a>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-code">404</div>
+        <div class="error-message">Page Not Found</div>
+        <div class="error-description" th:text="${errorMessage ?: 'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.'}">
+            The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </div>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home"></i> Go to Homepage
+        </a>
     </div>
 </body>
 </html>
